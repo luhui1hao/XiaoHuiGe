@@ -1,6 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    Properties props = new Properties()
+    props.load(new FileInputStream(file("signing.properties")))
+
+    signingConfigs {
+        release {
+            storeFile file(props['KEYSTORE_FILE'])//密钥文件路径
+            keyAlias props['KEY_ALIAS']//key别名
+            storePassword props['KEYSTORE_PASSWORD']//密钥文件密码
+            keyPassword props['KEY_PASSWORD']//key密码
+        }
+    }
     compileSdkVersion 26
     buildToolsVersion "25.0.3"
     defaultConfig {
@@ -10,6 +22,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
@@ -17,10 +30,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
